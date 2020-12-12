@@ -1,0 +1,24 @@
+{
+  "name": "include-bot",
+  "version": "1.0.0",
+  "description": "Bot for Discrod",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/G-Shamkhal/include-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/G-Shamkhal/include-bot/issues"
+  },
+  "homepage": "https://github.com/G-Shamkhal/include-bot#readme",
+  "dependencies": {
+    "discord-ytdl-core": "^5.0.0",
+    "discord.js": "^12.5.1",
+    "ytdl-core": "^4.1.4"
+  }
+}

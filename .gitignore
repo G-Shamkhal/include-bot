@@ -1,0 +1,6 @@
+node_modules/
+package-lock.json
+.idea/
+replace.bat
+start.bat
+Test.js
