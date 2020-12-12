@@ -7,7 +7,6 @@ const queue = new Map();
 let config = require('./config.json'); // Подключаем файл с параметрами и информацией
 //let token = config.token; // «Вытаскиваем» из него токен
 let prefix = config.prefix; // «Вытаскиваем» из него префикс
-require('ffmpeg');
 
 const token = process.env.token;
 
