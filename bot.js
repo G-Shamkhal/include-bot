@@ -20,7 +20,7 @@ robot.on('message', (msg) => { // Реагирование на сообщени
     var comm_name = comm.slice(0, comm.indexOf(" "));
 
     var args = comm.split(" ");
-    
+
     if (args[0] == "!restart") 
       restart(msg, args);
      else
@@ -39,10 +39,12 @@ function restart(mess, args) {
     return mess.channel.send("У вас нет прав"); /* Если у исполнителя команды нету привилегии MANGAGE_MESSAGES, он не сможет её использовать */
   }
   if (args[1] == "000") {
+    mess.delete().catch(); // Удаление сообщения пользователя после отправки 
     console.log("Bot restarting...");
     mess.channel.send("Перезагрузка бота...").then(robot.destroy()).then(robot.login(token)).then(mess.channel.send(robot.user.username + " запустился!"));
 
   } else {
+    
     console.log("Invalid restart password.");
     mess.channel.send("Неверный код автивации.");
   }
