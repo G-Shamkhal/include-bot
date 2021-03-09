@@ -249,6 +249,13 @@ function repeat(robot, mess, args) {
   Repeat = (args[1] == "on" || args[1] == "On") ? (true, mess.channel.send("Повторение включено.")) : (args[1] == "off" || args[1] == "Off") ? (false, mess.channel.send("Повторение выключено.")) : mess.channel.send("Я конечно не экстрасенс, но ты по-моему что-то не так ввёл. Давай по новой.");;
 }
 
+function restart(robot, mess, args) {
+  if (!mess.member.hasPermission("ADMINISTRATOR ")) {
+    return mess.channel.send("У вас нет прав"); /* Если у исполнителя команды нету привилегии MANGAGE_MESSAGES, он не сможет её использовать */
+  }
+  mess.channel.send("Перезагрузка бота...");
+  robot.destroy();
+}
 
 // Список комманд //
 
@@ -256,6 +263,11 @@ var comms_list = [{
   name: "help",
   out: help,
   about: "Выдать список всех команд и их описание."
+},
+{
+  name: "restart",
+  out: restart,
+  about: "Перезапустить бота."
 },
 {
   name: "hello",
