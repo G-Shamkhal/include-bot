@@ -145,10 +145,11 @@ function stop(robot, mess, args) {
   if (serverQueue) {
     if (serverQueue.voiceChannel) {
       serverQueue.voiceChannel.leave();
+      mess.channel.send("Воспроизведение завершено");
     }
   }
   Queue.delete(mess.guild.id);
-  mess.channel.send("Воспроизведение завершено");
+  
   console.log("\t\tEnd function STOP.");
 }
 
