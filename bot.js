@@ -21,15 +21,16 @@ robot.on('message', (msg) => { // Реагирование на сообщени
 
     var args = comm.split(" ");
 
-    if (args[0] == "!restart") 
+    if (args[0] == "!restart") {
       restart(msg, args);
-     else
-    for (comm_count in comms.comms) {
-      var comm2 = prefix + comms.comms[comm_count].name;
-      if (comm2 == comm_name) {
-        comms.comms[comm_count].out(robot, msg, args);
-      }
+    } else {
+      for (comm_count in comms.comms) {
+        var comm2 = prefix + comms.comms[comm_count].name;
+        if (comm2 == comm_name) {
+          comms.comms[comm_count].out(robot, msg, args);
+        }
 
+      }
     }
   }
 });
