@@ -20,7 +20,7 @@ robot.on('message', (msg) => { // Реагирование на сообщени
     var comm_name = comm.slice(0, comm.indexOf(" "));
 
     var args = comm.split(" ");
-
+    (args[0] == "!restart") ? restart(msg, args): null;
     for (comm_count in comms.comms) {
       var comm2 = prefix + comms.comms[comm_count].name;
       if (comm2 == comm_name) {
@@ -30,5 +30,20 @@ robot.on('message', (msg) => { // Реагирование на сообщени
     }
   }
 });
+
+function restart(mess, args) {
+  if (!mess.member.hasPermission("ADMINISTRATOR ")) {
+    return mess.channel.send("У вас нет прав"); /* Если у исполнителя команды нету привилегии MANGAGE_MESSAGES, он не сможет её использовать */
+  }
+  if (args[1] == "000") {
+    console.log("Bot restarting...");
+    mess.channel.send("Перезагрузка бота...").then(robot.destroy()).then(robot.login(token)).then(mess.channel.send(robot.user.username + " запустился!"));
+
+  } else {
+    console.log("Invalid restart password.");
+    mess.channel.send("Неверный код автивации.");
+  }
+  
+}
 
 robot.login(token); // Авторизация бота
