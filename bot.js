@@ -10,8 +10,6 @@ robot.on("ready", function () {
 
   /* При успешном запуске, в консоли появится сообщение «[Имя бота] запустился!» */
   console.log(robot.user.username + " запустился!");
-  var channel = robot.channels.get('my-unique-channel-id');
-  channel.sendMessage(robot.user.username + " запустился!");
 });
 
 
