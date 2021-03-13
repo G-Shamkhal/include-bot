@@ -12,11 +12,14 @@ var data = {
   Repeat: false
 };
 
+robot.login(token); // Авторизация бота
+
 robot.on("ready", function () {
   fs.writeFileSync('parametrs.json', JSON.stringify(data));
   /* При успешном запуске, в консоли появится сообщение «[Имя бота] запустился!» */
-  console.log(robot.user.username + " запустился!");
   robot.channels.get('786919558522994716').send(robot.user.username + " запустился!");
+  console.log(robot.user.username + " запустился!");
+  
 });
 
 
@@ -64,4 +67,3 @@ function restart(mess, args) {
   
 }
 
-robot.login(token); // Авторизация бота
