@@ -45,7 +45,6 @@ function restart(mess, args) {
     mess.channel.send("Перезагрузка бота...").then(process.exit(0));
     mess.channel.send(robot.user.username + " запустился!");
     console.log(robot.user.username + " запустился!");
-    
   } else {
 
     console.log("Invalid restart password.");
