@@ -7,10 +7,7 @@ let config = require('./config.json'); // Подключаем файл с ко�
 const prefix = config.prefix; // «Вытаскиваем» из него префикс
 const token = process.env.token;
 
-var data = {
-  Vol: 5,
-  Repeat: false
-};
+var Parametrs = JSON.parse(fs.readFileSync('parametrs.json', (err, data) => (data)));
 
 robot.login(token); // Авторизация бота
 
@@ -31,17 +28,14 @@ robot.on('message', (msg) => { // Реагирование на сообщени
 
     var args = comm.split(" ");
 
-    if (args[0] == "!restart") {
-      restart(msg, args);
-    } else {
       for (comm_count in comms.comms) {
         var comm2 = prefix + comms.comms[comm_count].name;
         if (comm2 == comm_name) {
-          comms.comms[comm_count].out(robot, msg, args);
+          comms.comms[comm_count].out(robot, msg, args, Parametrs);
         }
 
       }
-    }
+
   }
 });
 
@@ -49,7 +43,7 @@ robot.on("error", (error) => {
   robot.channels.cache.get('786919558522994716').send(error);
 });
 
-
+/*
 function restart(mess, args) {
   if (!mess.member.hasPermission("ADMINISTRATOR ")) {
     return mess.channel.send("У вас нет прав");  
@@ -65,5 +59,5 @@ function restart(mess, args) {
     console.log("Invalid restart password.");
     mess.channel.send("Неверный код автивации.");
   }
-  
+  */
 }

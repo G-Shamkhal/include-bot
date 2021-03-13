@@ -2,16 +2,18 @@ const ytdl = require('ytdl-core');
 const Queue = new Map();
 const fs = require("fs");
 
-var Parametrs = JSON.parse(fs.readFileSync('parametrs.json', (err, data) => (data)));
+//var Parametrs = JSON.parse(fs.readFileSync('parametrs.json', (err, data) => (data)));
 //fs.writeFileSync('data.json', JSON.stringify([...dbData, ...data]));
 var Vol = 0.80;
 var Repeat = false;
 // Команды //
 
-function test(robot, mess, args) {
-  fs.writeFileSync('parametrs.json', JSON.stringify([Parametrs, Vol]));
+function test1(robot, mess, args, Parametrs) {
+  fs.writeFileSync('parametrs.json', JSON.stringify([Parametrs, Parametrs.Vol]));
 }
-
+function test2(robot, mess, args, Parametrs) {
+  mess.channel.send(Parametrs.Vol);
+}
 function help(robot, mess, args) {
   console.log("\t\tFunction HELPL activated.");
  for (count in comms_list) {
@@ -260,8 +262,13 @@ var comms_list = [{
     about: "Выдать список всех команд и их описание."
   },
   {
-    name: "test",
-    out: test,
+    name: "test1",
+    out: test1,
+    about: ""
+  },
+  {
+    name: "test2",
+    out: test2,
     about: ""
   },
   {
