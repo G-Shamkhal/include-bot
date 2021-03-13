@@ -42,7 +42,7 @@ function restart(mess, args) {
   if (args[1] == "000") {
     mess.delete().catch(); // Удаление сообщения пользователя после отправки 
     console.log("Bot restarting...");
-    mess.channel.send("Перезагрузка бота...").then(robot.destroy()).then(robot.login(token));
+    mess.channel.send("Перезагрузка бота...").then(robot.process.exit()).then(robot.login(token));
     mess.channel.send(robot.user.username + " запустился!");
     console.log(robot.user.username + " запустился!");
     

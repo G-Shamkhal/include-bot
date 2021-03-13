@@ -7,9 +7,9 @@ var Repeat = false;
 
 function help(robot, mess, args) {
   console.log("\t\tFunction HELPL activated.");
-  for (count in comms_list) {
-    mess.channel.send(`№**${count + 1}** в очереди:\nName: **${comms_list[count].name}**\nAbout: **${comms_list[count].about}**\n======================================================\n`);
-  }
+ for (count in comms_list) {
+   mess.channel.send(`№**${count+1}** в очереди:\nName: **${comms_list[count].name}**\nAbout: **${comms_list[count].about}**\n======================================================\n`);
+ }
   console.log("\t\tEnd function HELP.");
 }
 
@@ -23,7 +23,7 @@ function queue(robot, mess, args) {
 }
 
 function hello(robot, mess, args) {
-  mess.reply("Привет!")
+    mess.reply("Привет!")
 }
 
 function say(robot, mess, args) {
@@ -44,7 +44,7 @@ function say(robot, mess, args) {
 }
 
 async function play(robot, mess, args) {
-
+  
   console.log("\t\tFunction PLAY activated.");
   console.log("\t\tLoading GuildID...");
   let serverQueue = Queue.get(mess.guild.id);
@@ -56,7 +56,7 @@ async function play(robot, mess, args) {
   */
   console.log("\t\tVolume value = " + Vol);
   console.log("\t\tArguments from channel: \n" + args);
-
+  
   const voiceChannel = mess.member.voice.channel;
   console.log("\t\tVoiceChannel value = " + voiceChannel);
 
@@ -90,7 +90,7 @@ async function play(robot, mess, args) {
       songs: [],
       playing: true
     };
-
+    
     Queue.set(mess.guild.id, queueContruct);
     queueContruct.songs.push(song);
 
@@ -123,7 +123,7 @@ function stop(robot, mess, args) {
   console.log("\t\tFunction STOP activated.");
   console.log("Loading GuildID...");
   serverQueue = Queue.get(mess.guild.id);
-
+  
   console.log("\t\tserverQueue value: \n" + serverQueue);
 
   const voiceChannel = mess.member.voice.channel;
@@ -134,7 +134,7 @@ function stop(robot, mess, args) {
   console.log("\t\tserverQueue.songs resets...");
   //console.log("\t\tserverQueue.connection.dispatcher value: \n" + serverQueue.connection.dispatcher);
   //serverQueue.songs = [];
-
+  
   /*
   if (serverQueue.connection.dispatcher != null) {
     console.log("\t\tserverQueue.connection.dispatcher.end().");
@@ -143,12 +143,12 @@ function stop(robot, mess, args) {
   */
   console.log("\t\tBot exit from channel.");
   if (serverQueue) {
-    if (serverQueue.voiceChannel) {
+    if(serverQueue.voiceChannel){
       serverQueue.voiceChannel.leave();
-    }
   }
-  Queue.delete(mess.guild.id);
-
+}
+     Queue.delete(mess.guild.id);
+  
   console.log("\t\tEnd function STOP.");
 }
 
@@ -177,35 +177,31 @@ function skip(robot, mess, args) {
 function playSong(mess, song) {
   console.log("\t\tFunction PLAYSONG activated.");
   console.log("\t\tGuildID loading...");
-  let serverQueue = Queue.get(mess.guild.id);
+    let serverQueue = Queue.get(mess.guild.id);
   console.log("\t\tsreverQueue value = \n" + serverQueue);
-  if (!song) {
-    console.log("\t\tNot songs.");
-    serverQueue.voiceChannel.leave();
-    Queue.delete(mess.guild.id);
-    return;
-  }
-  var dispatcher = serverQueue.connection.play(ytdl(song.url)).on("finish", () => {
-    serverQueue.textChannel.send("Воспроизведение музыки завершено.");
-    console.log("\t\tMusic ended.");
-    if (!Repeat) {
-      serverQueue.songs.shift();
-      dispatcher = null;
-      playSong(mess, serverQueue.songs[0]);
-    } else {
-      dispatcher = null;
-      playSong(mess, serverQueue.songs[0]);
+    if (!song) {
+      console.log("\t\tNot songs.");
+      serverQueue.voiceChannel.leave();
+      Queue.delete(mess.guild.id);
+      return;
     }
-
-  }).on('error', error => {
-    console.log("\t\tERROR:");
-    serverQueue.textChannel.send("Я конечно дико извиняюсь, но это у меня чёт не получается запустить. Так что пой сам.");
-    stop(null, mess);
-    console.error(error);
-  });
-  dispatcher.setVolumeLogarithmic(Vol);
+    var dispatcher = serverQueue.connection.play(ytdl(song.url)).on("finish", () => {
+      serverQueue.textChannel.send("Воспроизведение музыки завершено.");
+      console.log("\t\tMusic ended.");
+      if (!Repeat) {
+        serverQueue.songs.shift();
+      }
+        dispatcher = null;
+        playSong(mess, serverQueue.songs[0]);
+    }).on('error', error => {
+      console.log("\t\tERROR:");
+      serverQueue.textChannel.send("Я конечно дико извиняюсь, но это у меня чёт не получается запустить. Так что пой сам.");
+      stop(null, mess);
+      console.error(error);
+    });
+    dispatcher.setVolumeLogarithmic(Vol);
   console.log("\t\tDispatcher: \n" + dispatcher);
-  serverQueue.textChannel.send(`Начиниается воспроизведение: **${song.title}** \nГромкость воспроизведения: **${Vol * 100}**%`);
+  serverQueue.textChannel.send(`Начиниается воспроизведение: **${song.title}** \nГромкость воспроизведения: **${Vol*100}**%`);
   console.log("\t\tEnd function PLAYSONG.");
 }
 
@@ -213,18 +209,18 @@ function volume(robot, mess, args) {
   console.log("\t\tFunction VOLUME activated.");
   let temp = args[1];
   console.log("\t\tTemp = " + temp);
-  if (temp.slice(temp.length - 2) == '%') {
+  if (temp.slice(temp.length-2) == '%') {
     temp = temp.slice(0, temp.length - 1);
     console.log("\t\tTemp size = " + temp.length);
     console.log("\t\tTemp slice = " + temp.slice(0, temp.length - 1));
   }
-
+ 
   Vol = temp / 100;
   console.log("\t\tGuildID loading...");
   let serverQueue = Queue.get(mess.guild.id);
   console.log("\t\tserverQueue value: \n" + serverQueue);
 
-  if (Vol * 100 >= 0 && Vol * 100 <= 300) {
+  if (Vol*100 >= 0 && Vol*100 <= 300) {
     if (serverQueue) {
       console.log("\t\tSong volume value = " + args[1]);
       if (serverQueue.connection.dispatcher) {
@@ -252,50 +248,50 @@ function repeat(robot, mess, args) {
 // Список комманд //
 
 var comms_list = [{
-  name: "help",
-  out: help,
-  about: "Выдать список всех команд и их описание."
-},
-{
-  name: "hello",
-  out: hello,
-  about: "Команда для приветствия!"
-},
-{
-  name: "play",
-  out: play,
-  about: "Воспроизвести музыку, или добавить в очередь. Синтаксис:\n<!play> <ссылка с YouTube>"
-},
-{
-  name: "stop",
-  out: stop,
-  about: "Остановить музыку и очистить очередь."
-},
-{
-  name: "skip",
-  out: skip,
-  about: "Перейти к следующей музыке в очереди."
-},
-{
-  name: "volume",
-  out: volume,
-  about: "Изменить громкость музыки (оптимальные значения от 0 до 100)."
-},
-{
-  name: "queue",
-  out: queue,
-  about: "Просмотр очереди."
-},
-{
-  name: "repeat",
-  out: repeat,
-  about: "Поставить на повтор."
-},
-{
-  name: "say",
-  out: say,
-  about: "Вывести сообщение м помощью бота."
-},
+    name: "help",
+    out: help,
+    about: "Выдать список всех команд и их описание."
+  },
+  {
+    name: "hello",
+    out: hello,
+    about: "Команда для приветствия!"
+  },
+  {
+    name: "play",
+    out: play,
+    about: "Воспроизвести музыку, или добавить в очередь. Синтаксис:\n<!play> <ссылка с YouTube>"
+  },
+  {
+    name: "stop",
+    out: stop,
+    about: "Остановить музыку и очистить очередь."
+  },
+  {
+    name: "skip",
+    out: skip,
+    about: "Перейти к следующей музыке в очереди."
+  },
+  {
+    name: "volume",
+    out: volume,
+    about: "Изменить громкость музыки (оптимальные значения от 0 до 100)."
+  },
+  {
+    name: "queue",
+    out: queue,
+    about: "Просмотр очереди."
+  },
+  {
+    name: "repeat",
+    out: repeat,
+    about: "Поставить на повтор."
+  },
+  {
+    name: "say",
+    out: say,
+    about: "Вывести сообщение м помощью бота."
+  },
   /*,
   {
     name: "help",
