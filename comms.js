@@ -9,7 +9,7 @@ var Repeat = false;
 // Команды //
 
 function test(robot, mess, args) {
-  fs.writeFileSync('parametrs.json', JSON.stringify([...Parametrs, ...Vol]));
+  fs.writeFileSync('parametrs.json', JSON.stringify([Parametrs, Vol]));
 }
 
 function help(robot, mess, args) {
