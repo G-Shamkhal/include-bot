@@ -7,6 +7,14 @@ let config = require('./config.json'); // Подключаем файл с ко�
 const prefix = config.prefix; // «Вытаскиваем» из него префикс
 const token = process.env.token;
 
+var Parametrs = JSON.parse(fs.readFileSync('parametrs.json', (err, data) => (data)));
+
+var Default = {
+  Vol: 0.80,
+  Repeat: "off",
+};
+
+
 robot.login(token); // Авторизация бота
 
 robot.on("ready", function () {
@@ -26,10 +34,17 @@ robot.on('message', (msg) => { // Реагирование на сообщени
 
     var args = comm.split(" ");
 
+    if (Parametrs[msg.guild.id]) {
+      null
+    } else {
+      Parametrs = { [msg.guild.id]: Default };
+      save();
+    }
+
       for (comm_count in comms.comms) {
         var comm2 = prefix + comms.comms[comm_count].name;
         if (comm2 == comm_name) {
-          comms.comms[comm_count].out(robot, msg, args);
+          comms.comms[comm_count].out(robot, msg, args, Parametrs);
         }
 
       }
@@ -40,6 +55,10 @@ robot.on('message', (msg) => { // Реагирование на сообщени
 robot.on("error", (error) => {
   robot.channels.cache.get('786919558522994716').send(error);
 });
+
+function save() {
+  fs.writeFileSync('parametrs.json', JSON.stringify(Parametrs));
+}
 
 /*
 function restart(mess, args) {
