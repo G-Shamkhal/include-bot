@@ -1,5 +1,6 @@
 const Discord = require('discord.js'); // Подключаем библиотеку discord.js
 const robot = new Discord.Client(); // Объявляем, что robot - бот
+const fs = require("fs");
 const comms = require("./comms.js"); // Подключаем файл с командами для бота
 let config = require('./config.json'); // Подключаем файл с конфигруацией
 

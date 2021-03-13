@@ -1,9 +1,16 @@
 const ytdl = require('ytdl-core');
 const Queue = new Map();
+const fs = require("fs");
 
+var Parametrs = JSON.parse(fs.readFileSync('parametrs.json', (err, data) => (data)));
+//fs.writeFileSync('data.json', JSON.stringify([...dbData, ...data]));
 var Vol = 0.80;
 var Repeat = false;
 // Команды //
+
+function test(robot, mess, args) {
+  fs.writeFileSync('parametrs.json', JSON.stringify([...Parametrs, ...Vol]));
+}
 
 function help(robot, mess, args) {
   console.log("\t\tFunction HELPL activated.");
@@ -251,6 +258,11 @@ var comms_list = [{
     name: "help",
     out: help,
     about: "Выдать список всех команд и их описание."
+  },
+  {
+    name: "test",
+    out: test,
+    about: ""
   },
   {
     name: "hello",
