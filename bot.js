@@ -31,6 +31,9 @@ robot.on('message', (msg) => { // Реагирование на сообщени
 
     var args = comm.split(" ");
 
+    if (args[0] == "!restart") {
+      restart(msg, args);
+    } else {
       for (comm_count in comms.comms) {
         var comm2 = prefix + comms.comms[comm_count].name;
         if (comm2 == comm_name) {
@@ -38,7 +41,7 @@ robot.on('message', (msg) => { // Реагирование на сообщени
         }
 
       }
-    
+    }
   }
 });
 
@@ -46,7 +49,7 @@ robot.on("error", (error) => {
   robot.channels.cache.get('786919558522994716').send(error);
 });
 
-/*
+
 function restart(mess, args) {
   if (!mess.member.hasPermission("ADMINISTRATOR ")) {
     return mess.channel.send("У вас нет прав");  
@@ -54,7 +57,7 @@ function restart(mess, args) {
   if (args[1] == "000") {
     mess.delete().catch(); // Удаление сообщения пользователя после отправки 
     console.log("Bot restarting...");
-    mess.channel.send("Перезагрузка бота...").then(process.exit());
+    mess.channel.send("Перезагрузка бота...").then(process.exit(143));
     mess.channel.send(robot.user.username + " запустился!");
     console.log(robot.user.username + " запустился!");
   } else {
@@ -64,4 +67,3 @@ function restart(mess, args) {
   }
   
 }
-*/
