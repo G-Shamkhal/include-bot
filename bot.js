@@ -59,5 +59,6 @@ function restart(mess, args) {
     console.log("Invalid restart password.");
     mess.channel.send("Неверный код автивации.");
   }
-  */
+  
 }
+*/
