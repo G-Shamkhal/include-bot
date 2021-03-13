@@ -145,11 +145,10 @@ function stop(robot, mess, args) {
   if (serverQueue) {
     if (serverQueue.voiceChannel) {
       serverQueue.voiceChannel.leave();
-      mess.channel.send("Воспроизведение завершено");
     }
   }
   Queue.delete(mess.guild.id);
-  
+
   console.log("\t\tEnd function STOP.");
 }
 
@@ -249,16 +248,13 @@ function repeat(robot, mess, args) {
   Repeat = (args[1] == "on" || args[1] == "On") ? (true, mess.channel.send("Повторение включено.")) : (args[1] == "off" || args[1] == "Off") ? (false, mess.channel.send("Повторение выключено.")) : mess.channel.send("Я конечно не экстрасенс, но ты по-моему что-то не так ввёл. Давай по новой.");;
 }
 
+
 // Список комманд //
 
 var comms_list = [{
   name: "help",
   out: help,
   about: "Выдать список всех команд и их описание."
-},
-{
-  name: "restart",
-  about: "Перезапустить бота."
 },
 {
   name: "hello",
