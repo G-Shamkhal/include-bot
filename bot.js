@@ -17,7 +17,7 @@ robot.login(token); // Авторизация бота
 robot.on("ready", function () {
   fs.writeFileSync('parametrs.json', JSON.stringify(data));
   /* При успешном запуске, в консоли появится сообщение «[Имя бота] запустился!» */
-  robot.channels.get('786919558522994716').send(robot.user.username + " запустился!");
+  robot.channels.cache.get('786919558522994716').send(robot.user.username + " запустился!");
   console.log(robot.user.username + " запустился!");
   
 });
@@ -46,7 +46,7 @@ robot.on('message', (msg) => { // Реагирование на сообщени
 });
 
 robot.on("error", (error) => {
-  robot.channels.get('786919558522994716').send(error);
+  robot.channels.cache.get('786919558522994716').send(error);
 });
 
 function restart(mess, args) {
