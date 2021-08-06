@@ -13,4 +13,17 @@ import googleapiclient.discovery
 from googletrans import Translator
 from google_trans_new import google_translator
 from google.cloud import translate
+import youtube_dl
+
+
+
+
+
+
 import functions
+
+
+
+
+
+
