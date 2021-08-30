@@ -3,6 +3,7 @@ import discord
 from discord import client
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
+from discord.errors import Forbidden
 from discord.utils import get
 import json
 import os

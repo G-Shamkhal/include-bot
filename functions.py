@@ -1,3 +1,5 @@
+import discord
+
 from modules import *
 
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -125,7 +127,7 @@ class Song:
 
     def create_embed(self):
         embed = (discord.Embed(title='Сейчас играет',
-                               description='```css\n{0.source.title}\n```'.format(self),
+                               description='```yml\n{0.source.title}\n```'.format(self),
                                color=discord.Color.blurple())
                  .add_field(name='Длительность', value=self.source.duration)
                  .add_field(name='Запустил', value=self.requester.mention)
@@ -240,7 +242,8 @@ class VoiceState:
             self.voice = None
 
 #****************************************************************************************
-class Music(commands.Cog):
+
+class Bot(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.voice_states = {}
@@ -259,7 +262,7 @@ class Music(commands.Cog):
 
     def cog_check(self, ctx: commands.Context):
         if not ctx.guild:
-            raise commands.NoPrivateMessage('This command can\'t be used in DM channels.')
+            raise commands.NoPrivateMessage('Эта команда не может быть использована в каналах DM.')
 
         return True
 
@@ -267,7 +270,7 @@ class Music(commands.Cog):
         ctx.voice_state = self.get_voice_state(ctx)
 
     async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
-        await ctx.send('An error occurred: {}'.format(str(error)))
+        await ctx.send('Произошла ошибка: {}'.format(str(error)))
 
     @commands.command(name='join', invoke_without_subcommand=True)
     async def _join(self, ctx: commands.Context):
@@ -288,7 +291,7 @@ class Music(commands.Cog):
         """
 
         if not channel and not ctx.author.voice:
-            raise VoiceError('You are neither connected to a voice channel nor specified a channel to join.')
+            raise VoiceError('Вы не подключены к голосовому каналу и не указали канал для подключения.')
 
         destination = channel or ctx.author.voice.channel
         if ctx.voice_state.voice:
@@ -303,7 +306,7 @@ class Music(commands.Cog):
         """Clears the queue and leaves the voice channel."""
 
         if not ctx.voice_state.voice:
-            return await ctx.send('Not connected to any voice channel.')
+            return await ctx.send('Не подключен ни к одному голосовому каналу.')
 
         await ctx.voice_state.stop()
         del self.voice_states[ctx.guild.id]
@@ -313,14 +316,15 @@ class Music(commands.Cog):
         """Sets the volume of the player."""
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
+            return await ctx.send('В данный момент ничего не воспроизводится.')
 
-        if 0 > volume > 100:
-            return await ctx.send('Volume must be between 0 and 100')
+        if not volume >= 0 and volume <= 200:
+            return await ctx.send('Громкость должна быть от 0 до 200.')
 
         #ctx.voice_state.volume = volume / 100
         ctx.voice_client.source.volume = volume / 100
-        await ctx.send('Volume of the player set to {}%'.format(volume))
+        await ctx.send("""```fix\nГромкость проигрывателя установлена на {}%\n```""".format(volume))
+
 
     @commands.command(name='now', aliases=['current', 'playing'])
     async def _now(self, ctx: commands.Context):
@@ -396,7 +400,7 @@ class Music(commands.Cog):
         """
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.send('Очередь пустая.')
 
         items_per_page = 10
         pages = math.ceil(len(ctx.voice_state.songs) / items_per_page)
@@ -409,7 +413,7 @@ class Music(commands.Cog):
             queue += '`{0}.` [**{1.source.title}**]({1.source.url})\n'.format(i + 1, song)
 
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
-                 .set_footer(text='Viewing page {}/{}'.format(page, pages)))
+                 .set_footer(text='Просмотр страницы {}/{}'.format(page, pages)))
         await ctx.send(embed=embed)
 
     @commands.command(name='shuffle')
@@ -417,7 +421,7 @@ class Music(commands.Cog):
         """Shuffles the queue."""
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.send('Очередь пустая.')
 
         ctx.voice_state.songs.shuffle()
         await ctx.message.add_reaction('✅')
@@ -427,7 +431,7 @@ class Music(commands.Cog):
         """Removes a song from the queue at a given index."""
 
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.send('Очередь пустая.')
 
         ctx.voice_state.songs.remove(index - 1)
         await ctx.message.add_reaction('✅')
@@ -435,18 +439,15 @@ class Music(commands.Cog):
     @commands.command(name='clear')
     async def _clear(self, ctx: commands.Context):
         if len(ctx.voice_state.songs) == 0:
-            return await ctx.send('Empty queue.')
+            return await ctx.send('Очередь пустая.')
         ctx.voice_state.songs.clear()
         await ctx.message.add_reaction('✅')
 
     @commands.command(name='loop')
     async def _loop(self, ctx: commands.Context):
-        """Loops the currently playing song.
-        Invoke this command again to unloop the song.
-        """
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Nothing being played at the moment.')
+            return await ctx.send('В данный момент ничего не воспроизводится.')
 
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
@@ -454,13 +455,6 @@ class Music(commands.Cog):
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
-        """Plays a song.
-        If there are songs in the queue, this will be queued until the
-        other songs finished playing.
-        This command automatically searches from various sites if no URL is provided.
-        A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
-        """
-
 
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
@@ -469,14 +463,85 @@ class Music(commands.Cog):
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
             except YTDLError as e:
-                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                await ctx.send('При обработке этого запроса произошла ошибка: {}'.format(str(e)))
             else:
                 song = Song(source)
-
                 await ctx.voice_state.songs.put(song)
                 #await ctx.send('Enqueued {}'.format(str(source)))
 
         await ctx.message.delete()
+
+    @commands.command(name='hi')
+    async def _hi(self, ctx: commands.Context):
+        await ctx.send(ctx.author.mention + ' Привет!')
+
+    @commands.command(name='say')
+    async def _hi(self, ctx: commands.Context, *, args: str):
+        await ctx.send(args)
+
+        await ctx.message.delete()
+
+    @commands.command(name='quote')
+    async def _quote(self, ctx: commands.Context):
+        response = requests.get("https://zenquotes.io/api/random")
+        json_data = json.loads(response.text)
+
+        quote = [json_data[0]['a'], json_data[0]['q']]
+
+        translator = Translator()
+        translate = translator.translate(quote[1], dest='ru')
+
+        quote[1] = "EN: " + quote[1] + "\n\n" "RU: " + translate.text
+
+        await ctx.send(embed=discord.Embed( title=quote[0], description=quote[1], color=0x00BFFF).set_author(name="Цитата"))
+
+    @commands.command(name='img')
+    async def _img(self, ctx: commands.Context, *, args: str):
+        ran = random.randint(0, 9)
+        resource = googleapiclient.discovery.build("customsearch", "v1", developerKey=config['api_key']).cse()
+        result = resource.list(
+            q=f"{args}", cx=config['searchID'], searchType="image"
+        ).execute()
+        url = result["items"][ran]["link"]
+        embed = discord.Embed(colour=0xff9900, title=f"Вот ваше изображение ({args.title()})")
+        embed.set_image(url=url)
+        await ctx.send(embed=embed)
+
+    @commands.command(name='help')
+    async def _help(self, ctx: commands.Context):
+        embed = discord.Embed(colour=0x00BFFF, title='Описание',
+                              description='```yml\nДля обращения к боту перед командой используйте префикс «!».```')
+        embed.set_author(name='Справка от нарколога', icon_url='https://smileysplanet.ru/smileys/samsung/question-mark-2274.png')
+        embed.add_field(name='Музыка', value='- - - - - - - -', inline=False)
+        embed.add_field(name='```play```', value='Воспроизвести трек или добавить в очередь.', inline=True)
+        embed.add_field(name='```stop```', value='Остановить воспроизведение и очистить очередь.', inline=True)
+        embed.add_field(name='```skip```', value='Голосовать за пропуск текущего трека.', inline=True)
+        embed.add_field(name='```pause```', value='Поставить текущий трек на паузу.', inline=True)
+        embed.add_field(name='```resume```', value='Продолжить воспроизведение трека стоящего на паузе.', inline=True)
+        embed.add_field(name='```queue```', value='Просмотр очереди. При нескольких станицах нужно указать номер страницы', inline=True)
+        embed.add_field(name='```remove```', value='Удалить трек с указанным индексом из очереди.', inline=True)
+        embed.add_field(name='```clear```', value='Очистить всю очередь.', inline=True)
+        embed.add_field(name='```shuffle```', value='Перемешать очередь.', inline=True)
+        embed.add_field(name='```now```', value='Просмотр текущего трека.', inline=True)
+        embed.add_field(name='```leave```', value='Выгнать бота из голосового чата.', inline=True)
+        embed.add_field(name='```join```', value='Пригласить бота в голосовой чат если он не находится ни в одном.', inline=True)
+        embed.add_field(name='```summon```', value='Перетащить бота в текущий голосовй чат.', inline=True)
+        embed.add_field(name='```volume```', value='Задать громкость треку (0-200).', inline=True)
+        embed.add_field(name='```loop```', value='Зациклить воспроизведение текущего трека.', inline=True)
+
+        embed.add_field(name='Прочее', value='- - - - - - - -', inline=False)
+        embed.add_field(name='```hi```', value='Приветствие боту.', inline=True)
+        embed.add_field(name='```img```', value='Поиск изображения по имени.', inline=True)
+        embed.add_field(name='```quote```', value='Рандомная цитата.', inline=True)
+        embed.add_field(name='```say```', value='Написать сообщение от имени бота.', inline=True)
+        #embed.add_field(name='', value='', inline=True)
+        #embed.add_field(name='', value='', inline=True)
+        #embed.add_field(name='', value='', inline=True)
+        #embed.add_field(name='', value='', inline=True)
+        #embed.add_field(name='', value='', inline=True)
+        #embed.add_field(name='', value='', inline=True)
+
+        await ctx.send(embed=embed)
 
     @_join.before_invoke
     @_play.before_invoke
@@ -488,46 +553,11 @@ class Music(commands.Cog):
             if ctx.voice_client.channel != ctx.author.voice.channel:
                 raise commands.CommandError('Bot is already in a voice channel.')
 
+
+
 #*****************************************************************************************
 
-async def send(author, url, ico, heading, description, color, footer):
-    embed = discord.Embed(colour=color, title=heading, description=description)
-    embed.set_author(name=author)
-    embed.set_author(name=author, url=url, icon_url=ico)
-    #embed.set_thumbnail(url="url image ico")
-    #embed.add_field(name=" ", value=" ", inline=True)
-    embed.set_footer(text=footer)
-    return embed
-    #await message.channel.send(embed = embed)
 
-async def img(self, message, args):
-    ran = random.randint(0, 9)
-    resource = googleapiclient.discovery.build("customsearch", "v1", developerKey=config['api_key']).cse()
-    result = resource.list(
-        q=f"{args[1]}", cx=config['searchID'], searchType="image"
-    ).execute()
-    url = result["items"][ran]["link"]
-    embed = discord.Embed(colour=0xff9900, title=f"Вот ваше изображение ({args[1].title()})")
-    embed.set_image(url=url)
-    await message.channel.send(embed = embed)
-
-async def hi(self, message, args):
-    await message.channel.send(message.author.mention + ' Привет!')
-
-async def quote(self, message, args):
-    response = requests.get("https://zenquotes.io/api/random")
-    json_data = json.loads(response.text)
-    
-    quote = [json_data[0]['a'], json_data[0]['q']]
-
-    translator = Translator()
-    translate = translator.translate(quote[1], dest='ru')
-
-    quote[1] = "EN: " + quote[1] + "\n\n" "RU: " + translate.text
-
-    await send(message, "Цитата", quote[0], quote[1], 0x00BFFF)
-
-
-methods = [name for (name , obj) in vars().items() if hasattr(obj, "__class__") and obj.__class__.__name__ == "function"]
+#methods = [name for (name , obj) in vars().items() if hasattr(obj, "__class__") and obj.__class__.__name__ == "Bot"]
 #listFunc= [name for (name , obj) in vars().items() if hasattr(obj, "__class__") and obj.__class__.__name__ == "function"]
-#listFunc = [func for func in dir(function) if callable(getattr(function, func))]
+#listFunc = [func for func in dir(Bot) if callable(getattr(Bot, func))]
