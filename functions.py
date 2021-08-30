@@ -128,11 +128,11 @@ class Song:
     def create_embed(self):
         embed = (discord.Embed(title='Сейчас играет',
                                description='```yml\n{0.source.title}\n```'.format(self),
-                               color=discord.Color.blurple())
-                 .add_field(name='Длительность', value=self.source.duration)
-                 .add_field(name='Запустил', value=self.requester.mention)
-                 .add_field(name='Источник', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
-                 .add_field(name='URL', value='[Click]({0.source.url})'.format(self))
+                               color=discord.Color.blurple())\
+                 .add_field(name='Длительность', value=self.source.duration)\
+                 .add_field(name='Запустил', value=self.requester.mention)\
+                 .add_field(name='Источник', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))\
+                 .add_field(name='URL', value='[Click]({0.source.url})'.format(self))\
                  .set_thumbnail(url=self.source.thumbnail))
 
         return embed
