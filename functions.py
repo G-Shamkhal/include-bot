@@ -318,7 +318,8 @@ class Music(commands.Cog):
         if 0 > volume > 100:
             return await ctx.send('Volume must be between 0 and 100')
 
-        ctx.voice_state.volume = volume / 100
+        #ctx.voice_state.volume = volume / 100
+        ctx.voice_client.source.volume = volume / 100
         await ctx.send('Volume of the player set to {}%'.format(volume))
 
     @commands.command(name='now', aliases=['current', 'playing'])
@@ -332,7 +333,8 @@ class Music(commands.Cog):
     async def _pause(self, ctx: commands.Context):
         """Pauses the currently playing song."""
 
-        if not ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
+        #if not ctx.voice_state.is_playing and ctx.voice_state.voice.is_playing():
+        if not ctx.voice_state.voice.is_paused() and ctx.voice_state.is_playing:
             ctx.voice_state.voice.pause()
             await ctx.message.add_reaction('⏯')
 
@@ -341,7 +343,8 @@ class Music(commands.Cog):
     async def _resume(self, ctx: commands.Context):
         """Resumes a currently paused song."""
 
-        if not ctx.voice_state.is_playing and ctx.voice_state.voice.is_paused():
+        #if not ctx.voice_state.is_playing and ctx.voice_state.voice.is_paused():
+        if ctx.voice_state.voice.is_paused():
             ctx.voice_state.voice.resume()
             await ctx.message.add_reaction('⏯')
 
@@ -352,9 +355,12 @@ class Music(commands.Cog):
 
         ctx.voice_state.songs.clear()
 
-        if not ctx.voice_state.is_playing:
+        if ctx.voice_state.is_playing:
             ctx.voice_state.voice.stop()
+            await ctx.voice_state.stop()
             await ctx.message.add_reaction('⏹')
+        else:
+            await ctx.send("Для выполнения этой операции должна играть музыка.")
 
     @commands.command(name='skip')
     async def _skip(self, ctx: commands.Context):
@@ -363,7 +369,7 @@ class Music(commands.Cog):
         """
 
         if not ctx.voice_state.is_playing:
-            return await ctx.send('Not playing any music right now...')
+            return await ctx.send('Пропускать нечего...')
 
         voter = ctx.message.author
         if voter == ctx.voice_state.current.requester:
@@ -378,10 +384,10 @@ class Music(commands.Cog):
                 await ctx.message.add_reaction('⏭')
                 ctx.voice_state.skip()
             else:
-                await ctx.send('Skip vote added, currently at **{}/3**'.format(total_votes))
+                await ctx.send('Добавлено голосование за пропуск, в настоящее время голосов **{}/3**'.format(total_votes))
 
         else:
-            await ctx.send('You have already voted to skip this song.')
+            await ctx.send('Вы уже проголосовали за то, чтобы пропустить эту песню.')
 
     @commands.command(name='queue')
     async def _queue(self, ctx: commands.Context, *, page: int = 1):
@@ -426,6 +432,13 @@ class Music(commands.Cog):
         ctx.voice_state.songs.remove(index - 1)
         await ctx.message.add_reaction('✅')
 
+    @commands.command(name='clear')
+    async def _clear(self, ctx: commands.Context):
+        if len(ctx.voice_state.songs) == 0:
+            return await ctx.send('Empty queue.')
+        ctx.voice_state.songs.clear()
+        await ctx.message.add_reaction('✅')
+
     @commands.command(name='loop')
     async def _loop(self, ctx: commands.Context):
         """Loops the currently playing song.
@@ -448,6 +461,7 @@ class Music(commands.Cog):
         A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
         """
 
+
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
@@ -460,7 +474,9 @@ class Music(commands.Cog):
                 song = Song(source)
 
                 await ctx.voice_state.songs.put(song)
-                await ctx.send('Enqueued {}'.format(str(source)))
+                #await ctx.send('Enqueued {}'.format(str(source)))
+
+        await ctx.message.delete()
 
     @_join.before_invoke
     @_play.before_invoke
