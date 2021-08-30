@@ -1,8 +1,8 @@
 from modules import *
 
-bot = commands.Bot(command_prefix='!', help_command=None)
+bot = commands.Bot(command_prefix=prefix, help_command=None)
 bot.add_cog(functions.Bot(bot))
-
+print(prefix)
 @bot.event
 async def on_ready():
     print('Logged in as:\n{0.user.name}\n{0.user.id}'.format(bot))
