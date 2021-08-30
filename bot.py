@@ -19,4 +19,4 @@ async def on_command_error(ctx, error):
     #raise error
 
 #bot.run(config['token'])
-bot.run(os.environ['token'])
+bot.run(token)

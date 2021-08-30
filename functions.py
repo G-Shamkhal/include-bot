@@ -498,9 +498,11 @@ class Bot(commands.Cog):
     @commands.command(name='img')
     async def _img(self, ctx: commands.Context, *, args: str):
         ran = random.randint(0, 9)
-        resource = googleapiclient.discovery.build("customsearch", "v1", developerKey=config['api_key']).cse()
+        #resource = googleapiclient.discovery.build("customsearch", "v1", developerKey=config['api_key']).cse()
+        resource = googleapiclient.discovery.build("customsearch", "v1", developerKey=api_key).cse()
         result = resource.list(
-            q=f"{args}", cx=config['searchID'], searchType="image"
+            q=f"{args}", cx=searchID, searchType="image"
+            #q=f"{args}", cx=config['searchID'], searchType="image"
         ).execute()
         url = result["items"][ran]["link"]
         embed = discord.Embed(colour=0xff9900, title=f"Вот ваше изображение ({args.title()})")
