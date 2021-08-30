@@ -15,7 +15,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
         #print(bot.user.avatar_url())
         await ctx.send(embed = discord.Embed(colour=0xe6002e, title='sys.INFO', description = f'** {ctx.author.name}, данной команды не существует.\n'
-                                                                                              f'Для получения справки по командам введите: ```diff\n!help```**'))
+                                                                                           f'Для получения справки по командам введите: ```diff\n!help```**'))
     #raise error
 
 #bot.run(config['token'])
