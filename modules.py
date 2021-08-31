@@ -1,4 +1,4 @@
-#from config import config
+from config import config
 import discord
 from discord import client
 from discord.ext import commands
@@ -22,10 +22,15 @@ from google_trans_new import google_translator
 from google.cloud import translate
 import youtube_dl
 
-token = os.environ['token']
-prefix = os.environ['prefix']
-searchID = os.environ['searchID']
-api_key = os.environ['api_key']
+#token = os.environ['token']
+#prefix = os.environ['prefix']
+#searchID = os.environ['searchID']
+#api_key = os.environ['api_key']
+
+token = config['token']
+prefix = config['prefix']
+searchID = config['searchID']
+api_key = config['api_key']
 
 import functions
 
