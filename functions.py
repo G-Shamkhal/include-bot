@@ -384,11 +384,11 @@ class Bot(commands.Cog):
             ctx.voice_state.skip_votes.add(voter.id)
             total_votes = len(ctx.voice_state.skip_votes)
 
-            if total_votes >= 3:
-                await ctx.message.add_reaction('⏭')
-                ctx.voice_state.skip()
-            else:
-                await ctx.send('Добавлено голосование за пропуск, в настоящее время голосов **{}/3**'.format(total_votes))
+            #if total_votes >= 2:
+            await ctx.message.add_reaction('⏭')
+            ctx.voice_state.skip()
+            #else:
+            #    await ctx.send('Добавлено голосование за пропуск, в настоящее время голосов **{}/2**'.format(total_votes))
 
         else:
             await ctx.send('Вы уже проголосовали за то, чтобы пропустить эту песню.')
