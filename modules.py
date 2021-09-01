@@ -22,6 +22,8 @@ from google_trans_new import google_translator
 from google.cloud import translate
 import youtube_dl
 from ffmpy import FFmpeg
+import ctypes
+import ctypes.util
 
 token = os.environ['token']
 prefix = os.environ['prefix']
