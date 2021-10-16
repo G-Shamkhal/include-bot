@@ -247,8 +247,6 @@ class VoiceState:
 
 #****************************************************************************************
 
-voice_states = {}
-
 class Bot(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -273,6 +271,22 @@ class Bot(commands.Cog):
             raise commands.NoPrivateMessage('Эта команда не может быть использована в каналах DM.')
 
         return True
+
+    def getPlaylistLinks(self, url):
+        id = url.split("?list=", 1)[1]
+        r = requests.get(
+            "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=1000&playlistId={}&key=AIzaSyBrRDCWV4Y3pAgqyA8fNTlp9mZIwbyz7vI".format(
+                id))
+        data = r.json()
+        urls = []
+        for item in data['items']:
+            urls.append("https://youtube.com/watch?v={}".format(item['snippet']['resourceId']['videoId']))
+        return urls
+
+    def isYTPlaylist(self, url: str):
+        if url.find("?list=") != -1:
+            return True
+        return False
 
     async def cog_before_invoke(self, ctx: commands.Context):
         ctx.voice_state = self.get_voice_state(ctx)
@@ -369,8 +383,8 @@ class Bot(commands.Cog):
 
         if ctx.voice_state.is_playing:
             ctx.voice_state.voice.stop()
-            #await ctx.voice_state.stop()
-            del voice_states[ctx.guild.id]
+            await ctx.voice_state.stop()
+            #del voice_states[ctx.guild.id]
             #await ctx.voice_state.stop()
             await ctx.message.add_reaction('⏹')
         else:
@@ -465,21 +479,32 @@ class Bot(commands.Cog):
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
-
+        global state
         #if not ctx.voice_state.voice:
         voice = get(self.bot.voice_clients, guild=ctx.guild)
         if not (voice and voice.is_connected()):
             await ctx.invoke(self._join)
 
-        async with ctx.typing():
-            try:
-                source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
-            except YTDLError as e:
-                await ctx.send('При обработке этого запроса произошла ошибка: {}'.format(str(e)))
-            else:
-                song = Song(source)
-                await ctx.voice_state.songs.put(song)
-                #await ctx.send('Enqueued {}'.format(str(source)))
+        if self.isYTPlaylist(search):
+            search = self.getPlaylistLinks(search)
+            for url in search:
+                async with ctx.typing():
+                    try:
+                        source = await YTDLSource.create_source(ctx, url, loop=self.bot.loop)
+                    except YTDLError as e:
+                        await ctx.send('При обработке этого запроса произошла ошибка: {}'.format(str(e)))
+                    else:
+                        song = Song(source)
+                        await ctx.voice_state.songs.put(song)
+        else:
+            async with ctx.typing():
+                try:
+                    source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                except YTDLError as e:
+                    await ctx.send('При обработке этого запроса произошла ошибка: {}'.format(str(e)))
+                else:
+                    song = Song(source)
+                    await ctx.voice_state.songs.put(song)
 
         await ctx.message.delete()
 
@@ -566,7 +591,6 @@ class Bot(commands.Cog):
         if ctx.voice_client:
             if ctx.voice_client.channel != ctx.author.voice.channel:
                 raise commands.CommandError('Bot is already in a voice channel.')
-
 
 
 #*****************************************************************************************

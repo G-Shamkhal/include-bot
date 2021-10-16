@@ -24,6 +24,7 @@ import youtube_dl
 from ffmpy import FFmpeg
 import ctypes
 import ctypes.util
+from bs4 import BeautifulSoup
 
 token = os.environ['token']
 prefix = os.environ['prefix']
@@ -34,6 +35,8 @@ api_key = os.environ['api_key']
 #prefix = config['prefix']
 #searchID = config['searchID']
 #api_key = config['api_key']
+
+voice_states = {}
 
 import functions
 
