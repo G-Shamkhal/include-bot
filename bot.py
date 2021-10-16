@@ -18,5 +18,10 @@ async def on_command_error(ctx, error):
                                                                                            f'Для получения справки по командам введите: ```diff\n!help```**'))
     #raise error
 
+@bot.event
+async def on_member_join(member):
+    """Ввывод информации об выходе пользователя."""
+    await member.send(f'Добро пожаловать {member}! Напиши !help чтобы узнать мои команды.')
+
 #bot.run(config['token'])
 bot.run(token)

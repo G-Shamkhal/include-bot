@@ -203,7 +203,6 @@ class VoiceState:
     async def audio_player_task(self):
         while True:
             self.next.clear()
-
             if not self.loop:
                 # Try to get the next song within 3 minutes.
                 # If no song will be added to the queue in time,
@@ -224,6 +223,7 @@ class VoiceState:
 
     def play_next_song(self, error=None):
         if error:
+            #print(str(error))
             raise VoiceError(str(error))
 
         self.next.set()
@@ -240,19 +240,27 @@ class VoiceState:
         if self.voice:
             await self.voice.disconnect()
             self.voice = None
+            global voice_states
+            #voice_states = {}
+            del voice_states[self._ctx.guild.id]
+            #self.voice = {}
 
 #****************************************************************************************
+
+voice_states = {}
 
 class Bot(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.voice_states = {}
+        #self.voice_states = {}
+        global voice_states
+        voice_states = {}
 
     def get_voice_state(self, ctx: commands.Context):
-        state = self.voice_states.get(ctx.guild.id)
+        state = voice_states.get(ctx.guild.id)
         if not state:
             state = VoiceState(self.bot, ctx)
-            self.voice_states[ctx.guild.id] = state
+            voice_states[ctx.guild.id] = state
 
         return state
 
@@ -309,7 +317,7 @@ class Bot(commands.Cog):
             return await ctx.send('Не подключен ни к одному голосовому каналу.')
 
         await ctx.voice_state.stop()
-        del self.voice_states[ctx.guild.id]
+        del voice_states[ctx.guild.id]
 
     @commands.command(name='volume')
     async def _volume(self, ctx: commands.Context, *, volume: int):
@@ -361,7 +369,9 @@ class Bot(commands.Cog):
 
         if ctx.voice_state.is_playing:
             ctx.voice_state.voice.stop()
-            await ctx.voice_state.stop()
+            #await ctx.voice_state.stop()
+            del voice_states[ctx.guild.id]
+            #await ctx.voice_state.stop()
             await ctx.message.add_reaction('⏹')
         else:
             await ctx.send("Для выполнения этой операции должна играть музыка.")
@@ -456,7 +466,9 @@ class Bot(commands.Cog):
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
 
-        if not ctx.voice_state.voice:
+        #if not ctx.voice_state.voice:
+        voice = get(self.bot.voice_clients, guild=ctx.guild)
+        if not (voice and voice.is_connected()):
             await ctx.invoke(self._join)
 
         async with ctx.typing():
