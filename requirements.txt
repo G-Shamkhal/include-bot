@@ -19,3 +19,4 @@ grpcio==1.39.0
 ffmpy==0.3.0
 ffmpeg
 colorlog
+bs4
